@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "indoor-air-test-dynamodb-table" {
-  name           = "IndoorAir"
+  name           = "IndoorAirObservation${local.name_suffix}"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
@@ -46,10 +46,7 @@ resource "aws_dynamodb_table" "indoor-air-test-dynamodb-table" {
     type = "N"
   } */
 
-  tags = {
-    Name= "indoor-air-db"
-    Env = "dev"
-  }
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "lambda-assume-role-policy" {
@@ -72,20 +69,24 @@ data "aws_iam_policy_document" "indoor-air-test-table-write-policy-doc" {
 }
 
 resource "aws_iam_policy" "indoor-air-test-table-write-policy" {
-  name        = "indoor-air-test-table-write-policy"
+  name        = "IndoorAirObservation-Write${local.name_suffix}"
   description = "Write access to DynamoDB table"
   policy      = data.aws_iam_policy_document.indoor-air-test-table-write-policy-doc.json
+
+  tags = local.tags
 }
 
 resource "aws_iam_role" "indoor-air-test-write-role" {
-  name                = "indoor-air-test-write-role"
+  name                = "IndoorAirObservation-Write${local.name_suffix}"
   assume_role_policy  = data.aws_iam_policy_document.lambda-assume-role-policy.json
   managed_policy_arns = [aws_iam_policy.indoor-air-test-table-write-policy.arn, "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+
+  tags = local.tags
 }
 
 resource "aws_lambda_function" "put-indoor-air-observation-function" {
   filename      = "put_indoor_obs_lambda.zip"
-  function_name = "put-indoor-air-observation"
+  function_name = "PutIndoorAirObservation${local.name_suffix}"
   role          = aws_iam_role.indoor-air-test-write-role.arn
   handler       = "put_indoor_air_obs.lambda_handler"
 
@@ -102,29 +103,31 @@ resource "aws_lambda_function" "put-indoor-air-observation-function" {
     }
   }
 
-  tags = {
-      Name= "indoor-air-put-func"
-    Env = "dev"
-  }
+  tags = local.tags
 }
 
 resource "aws_cloudwatch_log_group" "indoor-observation" {
   name = "/aws/lambda/${aws_lambda_function.put-indoor-air-observation-function.function_name}"
 
   retention_in_days = 30
+
+  tags = local.tags
 }
 
 resource "aws_apigatewayv2_api" "indoor-air-restapi" {
-  name          = "indoor-air-restapi"
+  name          = "IndoorAirObservationAPI${local.name_suffix}"
   protocol_type = "HTTP"
+
+  tags = local.tags
 }
 
 resource "aws_apigatewayv2_stage" "indoor-air-restapi-stage" {
   api_id = aws_apigatewayv2_api.indoor-air-restapi.id
 
-  name        = "indoor-air-restapi-stage"
+  name        = "IndoorAirObservationAPIStage${local.name_suffix}"
   auto_deploy = true
 
+  tags = local.tags
 }
 
 resource "aws_apigatewayv2_integration" "indoor-air-restapi-integration" {
@@ -143,10 +146,32 @@ resource "aws_apigatewayv2_route" "indoor-air-restapi-post-observation" {
 }
 
 resource "aws_lambda_permission" "indoor-air-lambda-permission" {
-  statement_id  = "AllowExecutionFromIndoorAirAPI"
+  statement_id  = "AllowExecutionFromIndoorAirAPI${local.name_suffix}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.put-indoor-air-observation-function.function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.indoor-air-restapi.execution_arn}/*/*"
+}
+
+resource "aws_resourcegroups_group" "indoor-air-rg" {
+  name = "RG${local.name_suffix}"
+
+  resource_query {
+    query = <<JSON
+{
+  "ResourceTypeFilters": [
+    "AWS::AllSupported"
+  ],
+  "TagFilters": [
+    {
+      "Key": "project",
+      "Values": ["${var.project_name}"]
+    }
+  ]
+}
+JSON
+  }
+
+  tags = local.tags
 }
