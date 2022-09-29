@@ -1,23 +1,7 @@
-variable "project_name" {
-  description = "Name of the project."
-  type        = string
-  default     = "unsw-cse-brew"
-}
+variable "project_name" {}
 
-variable "environment" {
-  description = "Name of the environment."
-  type        = string
-  default     = "dev"
-}
+variable "environment" {}
 
-variable "lambda_archives_path" {
-  description = "Relative path to lambda archives"
-  type        = string
-  default     = "./lambdas_archives"
-}
+variable "lambda_archives_path" {}
 
-variable "resource_tags" {
-  description = "Tags to set for all resources"
-  type        = map(string)
-  default     = {}
-}
+variable "resource_tags" {}
