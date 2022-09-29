@@ -124,7 +124,7 @@ resource "aws_apigatewayv2_api" "indoor-air-restapi" {
 resource "aws_apigatewayv2_stage" "indoor-air-restapi-stage" {
   api_id = aws_apigatewayv2_api.indoor-air-restapi.id
 
-  name        = "IndoorAirObservationAPIStage${local.name_suffix}"
+  name        = "IndoorAirObservationAPI-v1${local.name_suffix}"
   auto_deploy = true
 
   tags = local.tags

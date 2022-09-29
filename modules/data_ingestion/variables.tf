@@ -13,7 +13,7 @@ variable "environment" {
 variable "lambda_archives_path" {
   description = "Relative path to lambda archives"
   type        = string
-  default     = "../lambdas_archives"
+  default     = "./lambdas_archives"
 }
 
 variable "resource_tags" {
