@@ -11,3 +11,16 @@ output "caller_arn" {
 output "caller_user" {
   value = data.aws_caller_identity.current.user_id
 }
+
+output "base_url" {
+  description = "Base URL for API Gateway stage."
+
+  value = module.data-ingestion.base_url
+}
+
+output "ingest_api_key" {
+description = "Ingest API KEY"
+
+  value = module.data-ingestion.api_key
+  sensitive = true
+}

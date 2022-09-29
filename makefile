@@ -9,8 +9,8 @@ zip_lambdas:
 deploy:
 	terraform init
 	terraform validate
-	terraform apply
-	terraform output -json > out.json
+	terraform apply -var-file="config.tfvars"
+	terraform output > variables.out
 
 destroy:
 	terraform destroy
