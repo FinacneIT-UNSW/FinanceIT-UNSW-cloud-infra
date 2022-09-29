@@ -10,6 +10,12 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "lambda_archives_path" {
+  description = "Relative path to lambda archives"
+  type        = string
+  default     = "../lambdas_archives"
+}
+
 variable "resource_tags" {
   description = "Tags to set for all resources"
   type        = map(string)

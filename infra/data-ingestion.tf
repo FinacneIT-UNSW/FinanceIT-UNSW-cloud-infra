@@ -85,12 +85,12 @@ resource "aws_iam_role" "indoor-air-test-write-role" {
 }
 
 resource "aws_lambda_function" "put-indoor-air-observation-function" {
-  filename      = "put_indoor_obs_lambda.zip"
+  filename      = "${var.lambda_archives_path}/put_indoor_air_obs.zip"
   function_name = "PutIndoorAirObservation${local.name_suffix}"
   role          = aws_iam_role.indoor-air-test-write-role.arn
   handler       = "put_indoor_air_obs.lambda_handler"
 
-  source_code_hash = filebase64sha256("put_indoor_obs_lambda.zip")
+  source_code_hash = filebase64sha256("${var.lambda_archives_path}/put_indoor_air_obs.zip")
 
   runtime     = "python3.9"
   memory_size = "128"
