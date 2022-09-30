@@ -10,11 +10,22 @@ logger.setLevel(logging.INFO)
 session = boto3.Session(region_name=os.environ['REGION'])
 dynamodb_client = session.client('dynamodb')
 
+ATTRIBUTES = ['DeviceID', 'Timestamp', 'Temperature', 'Co2', 'VOC', 'Humidity', 'PM25', 'PM10']
+
 def lambda_handler(event, context):
 
     try:
         payload = json.loads(event["body"])
-        logger.info("payload ->" + str(payload))
+
+        if not all(key in payload.keys() for key in ATTRIBUTES):
+            return {
+                'statusCode': 400,
+                'body': '{"status":"Missing attributes for insertion"}',
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            }
 
         dynamodb_response = dynamodb_client.put_item(
             TableName=os.environ["DYNAMO_TABLE"],
@@ -47,7 +58,7 @@ def lambda_handler(event, context):
         )
         logger.info(dynamodb_response)
         return {
-            'statusCode': 201,
+            'statusCode': 200,
             'body': 'successfully created item!',
             'headers': {
                 'Content-Type': 'application/json',
