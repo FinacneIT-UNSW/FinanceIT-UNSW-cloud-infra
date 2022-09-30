@@ -1,7 +1,7 @@
 output "base_url" {
   description = "Base URL for API Gateway stage."
 
-  value = aws_api_gateway_stage.api-stage-v1.invoke_url
+  value = aws_api_gateway_stage.v1.invoke_url
 }
 
 output "api_key" {

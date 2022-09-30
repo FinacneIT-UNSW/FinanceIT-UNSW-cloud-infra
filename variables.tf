@@ -13,13 +13,12 @@ variable "lambda_archives_path" {
   type        = string
 }
 
-variable "resource_tags" {
-  description = "Tags to set for all resources"
-  type        = map(string)
-  default     = {}
-}
-
 variable "aws_profil" {
   description = "AWS Profil to use (/.aws/creds)"
   type        = string
+}
+
+variable "table_name" {
+  description = "Table name to hold data"
+  type = string
 }

@@ -14,11 +14,49 @@ provider "aws" {
   region  = "ap-southeast-2"
 }
 
-module "data-ingestion" {
-  source = "./modules/data_ingestion"
+locals {
+  tags = {
+    project     = var.project_name,
+    environment = var.environment
+  }
 
-  project_name         = var.project_name
-  environment          = var.environment
+  name_suffix = "-${var.project_name}-${var.environment}"
+}
+
+module "api" {
+  source = "./modules/api"
+
+  tags                 = local.tags
+  name_suffix          = local.name_suffix
   lambda_archives_path = var.lambda_archives_path
-  resource_tags        = var.resource_tags
+  table                = module.dynamodb.table
+}
+
+module "dynamodb" {
+  source = "./modules/database"
+
+  tags        = local.tags
+  name_suffix = local.name_suffix
+  table_name  = var.table_name
+}
+
+
+resource "aws_resourcegroups_group" "indoor-air-rg" {
+  name = "RG${local.name_suffix}"
+
+  resource_query {
+    query = <<JSON
+{
+  "ResourceTypeFilters": [
+    "AWS::AllSupported"
+  ],
+  "TagFilters": [
+    {
+      "Key": "project",
+      "Values": ["${var.project_name}"]
+    }
+  ]
+}
+JSON
+  }
 }

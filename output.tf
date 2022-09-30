@@ -15,12 +15,12 @@ output "caller_user" {
 output "base_url" {
   description = "Base URL for API Gateway stage."
 
-  value = module.data-ingestion.base_url
+  value = module.api.base_url
 }
 
 output "ingest_api_key" {
-description = "Ingest API KEY"
+  description = "Ingest API KEY"
 
-  value = module.data-ingestion.api_key
+  value     = module.api.api_key
   sensitive = true
 }
