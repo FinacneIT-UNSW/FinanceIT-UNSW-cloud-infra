@@ -40,6 +40,15 @@ module "dynamodb" {
   table_name  = var.table_name
 }
 
+module "websocket" {
+  source = "./modules/websocket"
+
+  tags                 = local.tags
+  name_suffix          = local.name_suffix
+  table = module.dynamodb.table
+  lambda_archives_path = var.lambda_archives_path
+}
+
 
 resource "aws_resourcegroups_group" "indoor-air-rg" {
   name = "RG${local.name_suffix}"

@@ -1,23 +1,28 @@
 import logging
 import boto3
+import traceback
 import json
 import os
 
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
 
-session = boto3.Session(region_name=os.environ['REGION'])
+REGION = os.environ.get('REGION', 'ap-southeast-2')
+session = boto3.Session(region_name=REGION)
 dynamodb_client = session.client('dynamodb')
 
+TABLE_NAME = os.environ["DYNAMO_TABLE"]
 ATTRIBUTES = ['DeviceID', 'Timestamp', 'Temperature', 'Co2', 'VOC', 'Humidity', 'PM25', 'PM10']
 
 def lambda_handler(event, context):
 
     try:
+        LOGGER.info(f"Received event: {event}")
         payload = json.loads(event["body"])
 
         if not all(key in payload.keys() for key in ATTRIBUTES):
+            LOGGER.info(f"Missing parameters in requests")
             return {
                 'statusCode': 400,
                 'body': '{"status":"Missing attributes for insertion"}',
@@ -28,7 +33,7 @@ def lambda_handler(event, context):
             }
 
         dynamodb_response = dynamodb_client.put_item(
-            TableName=os.environ["DYNAMO_TABLE"],
+            TableName=TABLE_NAME,
             Item={
                 "DeviceID": {
                     "S": payload["DeviceID"]
@@ -56,7 +61,7 @@ def lambda_handler(event, context):
                 }
             }
         )
-        logger.info(dynamodb_response)
+        LOGGER.info(f"Item inserted")
         return {
             'statusCode': 200,
             'body': 'successfully created item!',
@@ -66,7 +71,8 @@ def lambda_handler(event, context):
             }
         }
     except Exception as e:
-        logger.error(e)
+        LOGGER.error(f"Error inserting item: {e}")
+        traceback.print_exc()
         return {
             'statusCode': 500,
             'body': '{"status":"Server error"}',

@@ -24,3 +24,9 @@ output "ingest_api_key" {
   value     = module.api.api_key
   sensitive = true
 }
+
+output "websocket" {
+  description = "Base URL for API Gateway stage."
+
+  value = module.websocket.endpoint
+}

@@ -5,6 +5,8 @@ resource "aws_dynamodb_table" "main-table" {
   write_capacity = var.write_capacity
   hash_key       = "DeviceID"
   range_key      = "Timestamp"
+  stream_enabled = true
+  stream_view_type = "NEW_IMAGE"
 
   attribute {
     name = "DeviceID"
@@ -15,6 +17,6 @@ resource "aws_dynamodb_table" "main-table" {
     name = "Timestamp"
     type = "N"
   }
-  
+
   tags = var.tags
 }
