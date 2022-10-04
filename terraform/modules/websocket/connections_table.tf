@@ -1,8 +1,8 @@
 resource "aws_dynamodb_table" "connections" {
   name           = "WebsocketAPIConnections${var.name_suffix}"
   billing_mode   = "PROVISIONED"
-  read_capacity  = 5
-  write_capacity = 5
+  read_capacity  = 1
+  write_capacity = 1
   hash_key       = "connectionId"
 
   attribute {
