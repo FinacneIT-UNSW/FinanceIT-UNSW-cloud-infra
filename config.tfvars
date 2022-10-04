@@ -4,3 +4,4 @@ environment          = "dev"
 project_name         = "unsw-cse-brew"
 
 table_name = "SensorData"
+helloUNSW = ""
