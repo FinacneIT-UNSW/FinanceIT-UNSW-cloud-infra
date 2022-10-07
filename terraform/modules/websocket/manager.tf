@@ -3,7 +3,7 @@ data "aws_iam_policy_document" "manage-connections-doc" {
     actions   = ["execute-api:ManageConnections"]
     resources = [
       aws_apigatewayv2_api.websocket.arn,
-      "arn:aws:execute-api:ap-southeast-2:${data.aws_caller_identity.current.account_id}:${aws_apigatewayv2_api.websocket.id}/v1/POST/*/*"
+      "arn:aws:execute-api:ap-southeast-2:${data.aws_caller_identity.current.account_id}:${aws_apigatewayv2_api.websocket.id}/${aws_apigatewayv2_api.websocket.name}v1/POST/*/*"
       ]
     effect    = "Allow"
   }

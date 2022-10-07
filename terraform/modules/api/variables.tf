@@ -1,17 +1,29 @@
 data "aws_caller_identity" "current" {}
 
 variable "tags" {
-    type = map
+  type = map(any)
 }
 
 variable "name_suffix" {
   type = string
 }
 
-variable "lambda_archives_path" {
-    type = string
+variable "table" {
+  type = map(any)
 }
 
-variable "table" {
+variable "ressource_name" {
+  type = string
+}
+
+variable "stage_name" {
+  type = string
+}
+
+variable "get" {
+  type = map
+} 
+
+variable "post" {
   type = map
 }

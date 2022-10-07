@@ -25,8 +25,8 @@ output "ingest_api_key" {
   sensitive = true
 }
 
-output "websocket" {
+/* output "websocket" {
   description = "Base URL for API Gateway stage."
 
   value = module.websocket.endpoint
-}
+} */

@@ -1,24 +1,8 @@
-data "aws_iam_policy_document" "main-table-write-policy-doc" {
-  statement {
-    actions   = ["dynamodb:PutItem"]
-    resources = [var.table.arn]
-    effect    = "Allow"
-  }
-}
-
-resource "aws_iam_policy" "main-table-write-policy" {
-  name        = "${var.table.name}-Write${var.name_suffix}"
-  description = "Write access to DynamoDB table"
-  policy      = data.aws_iam_policy_document.main-table-write-policy-doc.json
-
-  tags = var.tags
-}
-
 resource "aws_iam_role" "put-point-lambda" {
-  name                = "Put${var.table.name}-Lambda${var.name_suffix}"
+  name                = "Post${var.table.name}-Lambda${var.name_suffix}"
   assume_role_policy  = data.aws_iam_policy_document.lambda-assume-role-policy.json
   managed_policy_arns = [
-    aws_iam_policy.main-table-write-policy.arn,
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.table.name}-CRUD",
     aws_iam_policy.lambda-logging-policy.arn,
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   ]
@@ -37,16 +21,16 @@ resource "aws_lambda_permission" "execute-from-api-put-point" {
 }
 
 resource "aws_lambda_function" "put-point" {
-  filename      = "${var.lambda_archives_path}/point_put.zip"
+  filename      = var.post.file_path
   function_name = "Post${var.table.name}${var.name_suffix}"
   role          = aws_iam_role.put-point-lambda.arn
-  handler       = "point_put.lambda_handler"
+  handler       = var.post.handler
 
-  source_code_hash = filebase64sha256("${var.lambda_archives_path}/point_put.zip")
+  source_code_hash = filebase64sha256(var.post.file_path)
 
-  runtime     = "python3.9"
-  memory_size = "128"
-  timeout     = "5"
+  runtime     = var.post.runtime
+  memory_size = var.post.memory_size
+  timeout     = var.post.timeout
 
   environment {
     variables = {

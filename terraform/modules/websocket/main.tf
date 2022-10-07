@@ -76,8 +76,6 @@ resource "aws_apigatewayv2_deployment" "dep" {
 
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_apigatewayv2_integration.connect.id,
-      aws_apigatewayv2_integration.disconnect.id,
       filebase64sha256("${var.lambda_archives_path}/websocket_manager.zip"),
       filebase64sha256("${var.lambda_archives_path}/websocket_message.zip")
     ]))

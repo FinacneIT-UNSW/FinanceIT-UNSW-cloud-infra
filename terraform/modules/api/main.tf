@@ -39,7 +39,7 @@ resource "aws_api_gateway_rest_api" "api" {
 }
 
 resource "aws_api_gateway_resource" "point" {
-  path_part   = "point"
+  path_part   = var.ressource_name
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.api.id
 }
@@ -55,7 +55,8 @@ resource "aws_api_gateway_deployment" "api" {
       aws_api_gateway_integration.point-post-put.id,
       aws_api_gateway_method.point-get.id,
       aws_api_gateway_integration.point-get-query.id,
-      filebase64sha256("${var.lambda_archives_path}/point_put.zip")
+      filebase64sha256(var.get.file_path),
+      filebase64sha256(var.post.file_path)
     ]))
   }
 
@@ -67,7 +68,7 @@ resource "aws_api_gateway_deployment" "api" {
 resource "aws_api_gateway_stage" "v1" {
   deployment_id = aws_api_gateway_deployment.api.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  stage_name    = "${aws_api_gateway_rest_api.api.name}-v1"
+  stage_name    = "${aws_api_gateway_rest_api.api.name}-${var.stage_name}"
 
   tags = var.tags
 }
