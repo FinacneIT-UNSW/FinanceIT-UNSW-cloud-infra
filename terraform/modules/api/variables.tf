@@ -5,25 +5,31 @@ variable "tags" {
 }
 
 variable "name_suffix" {
-  type = string
+  description = "Append a suffix at the end of all ressource names"
+  type        = string
 }
 
 variable "table" {
-  type = map(any)
+  description = "Table name, arn and stream"
+  type        = map(any)
 }
 
 variable "ressource_name" {
-  type = string
+  description = "Name of the ressource (exemple: /data)"
+  type        = string
 }
 
 variable "stage_name" {
-  type = string
+  description = "Name of the stage (exemple: v1)"
+  type        = string
 }
 
 variable "get" {
-  type = map
-} 
+  description = "Configuration for Get endpoint"
+  type        = map(any)
+}
 
 variable "post" {
-  type = map
+  description = "Configuration for Post endpoint"
+  type        = map(any)
 }

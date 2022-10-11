@@ -1,1 +1,0 @@
-aws_profil="eleve.isep.free"

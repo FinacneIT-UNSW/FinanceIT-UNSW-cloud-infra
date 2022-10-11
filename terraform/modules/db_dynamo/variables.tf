@@ -3,41 +3,52 @@ variable "tags" {
 }
 
 variable "name_suffix" {
-  type = string
+  description = "Suffix to append to all ressource names."
+  type        = string
 }
 
 variable "table_name" {
-  type = string
+  description = "Name of the main Table"
+  type        = string
 }
 
 variable "read_capacity" {
-  type = number
+  description = "Read capacity for the table"
+  type        = number
 }
 
 variable "write_capacity" {
-  type = number
+  description = "Write capacity for the table"
+  type        = number
 }
 
 variable "hash_key_name" {
-  type = string
+  description = "Name of the hash key"
+  type        = string
 }
 
 variable "hash_key_type" {
-  type = string
+  description = "Type of the hash key"
+  type        = string
 }
 
 variable "sort_key_name" {
-  type = string
+  description = "Name of the sort key"
+  type        = string
 }
 
 variable "sort_key_type" {
-  type = string
+  description = "Type of the sort key"
+  type        = string
 }
 
 variable "isstream" {
-  type = bool
+  description = "Activate the stream or not (for websocket module)"
+  type        = bool
 }
 
 variable "stream_type" {
-  type = string
+  description = "Stream type"
+  type        = string
+  default     = null
 }

@@ -11,9 +11,9 @@ init:
 
 deploy:
 	terraform validate
-	terraform apply -var-file="config.tfvars"
+	terraform apply -auto-approve -json > ../apply.log
 	terraform output > variables.out
 	terraform output -json ingest_api_key > ingest.json
 
 destroy:
-	terraform destroy -var-file="config.tfvars"
+	terraform destro -var-file="config.tfvars"
