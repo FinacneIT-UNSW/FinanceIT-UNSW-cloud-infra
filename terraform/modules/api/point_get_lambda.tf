@@ -1,24 +1,8 @@
-data "aws_iam_policy_document" "main-table-query-policy-doc" {
-  statement {
-    actions   = ["dynamodb:Query"]
-    resources = [var.table.arn]
-    effect    = "Allow"
-  }
-}
-
-resource "aws_iam_policy" "main-table-query-policy" {
-  name        = "${var.table.name}-Query${var.name_suffix}"
-  description = "Query access to DynamoDB table"
-  policy      = data.aws_iam_policy_document.main-table-query-policy-doc.json
-
-  tags = var.tags
-}
-
 resource "aws_iam_role" "query-point-lambda" {
-  name                = "Query${var.table.name}${var.name_suffix}"
+  name                = "Get${var.table.name}${var.name_suffix}"
   assume_role_policy  = data.aws_iam_policy_document.lambda-assume-role-policy.json
   managed_policy_arns = [
-    aws_iam_policy.main-table-query-policy.arn,
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.table.name}-CRUD",
     aws_iam_policy.lambda-logging-policy.arn,
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   ]
@@ -36,16 +20,16 @@ resource "aws_lambda_permission" "execute-from-api-query-point" {
 }
 
 resource "aws_lambda_function" "query-point" {
-  filename      = "${var.lambda_archives_path}/point_query.zip"
-  function_name = "Query${var.table.name}${var.name_suffix}"
+  filename      = var.get.file_path
+  function_name = "Get${var.table.name}${var.name_suffix}"
   role          = aws_iam_role.query-point-lambda.arn
-  handler       = "point_query.lambda_handler"
+  handler       = var.get.handler
 
-  source_code_hash = filebase64sha256("${var.lambda_archives_path}/point_query.zip")
+  source_code_hash = filebase64sha256(var.get.file_path)
 
-  runtime     = "python3.9"
-  memory_size = "128"
-  timeout     = "5"
+  runtime     = var.get.runtime
+  memory_size = var.get.memory_size
+  timeout     = var.get.timeout
 
   environment {
     variables = {

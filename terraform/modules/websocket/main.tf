@@ -11,10 +11,10 @@ data "aws_iam_policy_document" "lambda-assume-role-policy" {
 
 data "aws_iam_policy_document" "lambda-logging-policy-doc" {
   statement {
-    actions   = [
+    actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents"
-      ]
+    ]
     resources = ["arn:aws:logs:*:*:*"]
     effect    = "Allow"
   }
@@ -29,7 +29,7 @@ resource "aws_iam_policy" "lambda-logging-policy" {
 }
 
 resource "aws_apigatewayv2_api" "websocket" {
-  name                       = "StreamDBNewItems-WEBSOCKET-API${var.name_suffix}"
+  name                       = "WebsocketStreamAPI"
   protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"
 
@@ -61,7 +61,7 @@ resource "aws_apigatewayv2_integration" "disconnect" {
   api_id           = aws_apigatewayv2_api.websocket.id
   integration_type = "AWS_PROXY"
 
-  description        = "Handle Websocket Disconnection"
+  description        = "Handle Websocket Disconnections"
   integration_method = "POST"
   integration_uri    = aws_lambda_function.manager.invoke_arn
 }
@@ -76,14 +76,12 @@ resource "aws_apigatewayv2_deployment" "dep" {
 
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_apigatewayv2_integration.connect.id,
-      aws_apigatewayv2_integration.disconnect.id,
-      filebase64sha256("${var.lambda_archives_path}/websocket_manager.zip"),
-      filebase64sha256("${var.lambda_archives_path}/websocket_message.zip")
+      filebase64sha256(var.manager.file_path),
+      filebase64sha256(var.message.file_path)
     ]))
 
   }
-  
+
   depends_on = [
     aws_apigatewayv2_route.connect,
     aws_apigatewayv2_route.disconnect
@@ -92,7 +90,7 @@ resource "aws_apigatewayv2_deployment" "dep" {
 
 resource "aws_apigatewayv2_stage" "v1" {
   api_id        = aws_apigatewayv2_api.websocket.id
-  name          = "${aws_apigatewayv2_api.websocket.name}v1"
+  name          = "${aws_apigatewayv2_api.websocket.name}-${var.stage_name}"
   deployment_id = aws_apigatewayv2_deployment.dep.id
 
   tags = var.tags

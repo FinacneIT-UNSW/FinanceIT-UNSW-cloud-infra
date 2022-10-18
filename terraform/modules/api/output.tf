@@ -8,8 +8,8 @@ output "api_key" {
   description = "API KEY value"
 
   value = {
-    name = aws_api_gateway_api_key.api-key.name,
-    key = aws_api_gateway_api_key.api-key.value
+    key_name   = aws_api_gateway_api_key.api-key.name,
+    key_secret = aws_api_gateway_api_key.api-key.value
   }
   sensitive = true
 }
